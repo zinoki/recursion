@@ -5,9 +5,9 @@
 
 var stringifyJSON = function(obj) {
   if (obj === null) {
-    return null;
+    return 'null';
   }
-  let type = typeof(obj);
+  var type = typeof(obj);
   if (type === 'string') {
     return '\"' + obj + '\"';
   }
@@ -18,22 +18,30 @@ var stringifyJSON = function(obj) {
     return obj.toString();
   }
   if (Array.isArray(obj)) {
-    var str = '[';
-    for (let i = 0; i < obj.length; i++) {
-      str += stringifyJSON(obj[i])
-      str += ',';
-    }
-    if (str[str.length - 1] === ',') {
-      str = str.slice(0, str.length - 1)
-    }
-    return str + ']';
-  }
-  if (type === 'object') {
-    var str = '{';
-    for (var key in obj) {
-      if (typeof(obj[key]) === 'function') {
-        
+    var str = '';
+    for (var i = 0; i < obj.length; i++) {
+      if (str !== "") {
+        str = str + "," + stringifyJSON(obj[i]);
+      }
+      else {
+        str = stringifyJSON(obj[i])
       }
     }
+    return '[' + str + ']';
+  } else if (type === 'object' && obj !== null) {
+    var str = "";
+    for (var key in obj) {
+        if (typeof(obj[key]) !== 'function' && typeof(obj[key]) !== 'undefined') {
+          if (str != "") {
+            str = str + "," + stringifyJSON(key) + ":" + stringifyJSON(obj[key]);
+          } else {
+            str = stringifyJSON(key) + ':' + stringifyJSON(obj[key]);
+          }
+        }
+      }
+    return "{" + str + "}";
+  } else {
+    return String(obj);
   }
+
 };
